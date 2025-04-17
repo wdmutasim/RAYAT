@@ -112,99 +112,170 @@ if (isset($_GET['delete_id']) && is_numeric($_GET['delete_id'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة المسؤول</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>لوحة تحكم المسؤول</h1>
+    <div class="container my-4">
+        <h1 class="display-5 text-primary mb-4 text-center">لوحة تحكم المسؤول</h1>
 
-    <h2>إضافة درجة</h2>
-    <form method="post">
-        <select name="student_id" required>
-            <?php foreach ($students as $student) { ?>
-                <option value="<?php echo $student['id']; ?>"><?php echo htmlspecialchars($student['name']); ?></option>
-            <?php } ?>
-        </select>
-        <select name="course_id" required>
-            <?php foreach ($courses as $course) { ?>
-                <option value="<?php echo $course['id']; ?>"><?php echo htmlspecialchars($course['course_name']); ?></option>
-            <?php } ?>
-        </select>
-        <input type="number" name="grade" placeholder="الدرجة" required>
-        <button type="submit" name="add_grade">إضافة</button>
-    </form>
+        <!-- إضافة درجة -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">إضافة درجة</div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select name="student_id" class="form-select" required>
+                                <?php foreach ($students as $student) { ?>
+                                    <option value="<?php echo $student['id']; ?>"><?php echo htmlspecialchars($student['name']); ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="course_id" class="form-select" required>
+                                <?php foreach ($courses as $course) { ?>
+                                    <option value="<?php echo $course['id']; ?>"><?php echo htmlspecialchars($course['course_name']); ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="grade" class="form-control" placeholder="الدرجة" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" name="add_grade" class="btn btn-primary w-100">إضافة</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <h2>إضافة طالب جديد</h2>
-    <form method="post">
-        <input type="text" name="name" placeholder="الاسم" required>
-        <input type="email" name="email" placeholder="البريد الإلكتروني" required>
-        <input type="password" name="password" placeholder="كلمة المرور" required>
-        <button type="submit" name="add_student">إضافة الطالب</button>
-    </form>
+        <!-- إضافة طالب جديد -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">إضافة طالب جديد</div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="name" class="form-control" placeholder="الاسم" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" name="email" class="form-control" placeholder="البريد الإلكتروني" required>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="password" name="password" class="form-control" placeholder="كلمة المرور" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" name="add_student" class="btn btn-primary w-100">إضافة الطالب</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <h2>إضافة كورس جديد</h2>
-    <form method="post">
-        <input type="text" name="course_name" placeholder="اسم الكورس" required>
-        <input type="text" name="course_code" placeholder="كود الكورس" required> <!-- تم تعديل حقل الوصف إلى كود الكورس -->
-        <button type="submit" name="add_course">إضافة الكورس</button>
-    </form>
+        <!-- إضافة كورس جديد -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">إضافة كورس جديد</div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <input type="text" name="course_name" class="form-control" placeholder="اسم الكورس" required>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="course_code" class="form-control" placeholder="كود الكورس" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" name="add_course" class="btn btn-primary w-100">إضافة الكورس</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <h2>إضافة نسبة حضور</h2>
-    <form method="POST">
-        <label for="student_id">اختر الطالب:</label>
-        <select name="student_id" required>
-            <?php foreach ($students as $student): ?>
-                <option value="<?= $student['id']; ?>"><?= htmlspecialchars($student['name']); ?></option>
-            <?php endforeach; ?>
-        </select><br><br>
+        <!-- إضافة نسبة حضور -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">إضافة نسبة حضور</div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="student_id" class="form-label">اختر الطالب:</label>
+                            <select name="student_id" class="form-select" required>
+                                <?php foreach ($students as $student): ?>
+                                    <option value="<?= $student['id']; ?>"><?= htmlspecialchars($student['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="course_id" class="form-label">اختر الكورس:</label>
+                            <select name="course_id" class="form-select" required>
+                                <?php foreach ($courses as $course): ?>
+                                    <option value="<?= $course['id']; ?>"><?= htmlspecialchars($course['course_name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="attendance_percentage" class="form-label">نسبة الحضور (%):</label>
+                            <input type="number" name="attendance_percentage" class="form-control" min="0" max="100" step="0.01" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" name="add_attendance" class="btn btn-primary w-100">إضافة الحضور</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        <label for="course_id">اختر الكورس:</label>
-        <select name="course_id" required>
-            <?php foreach ($courses as $course): ?>
-                <option value="<?= $course['id']; ?>"><?= htmlspecialchars($course['course_name']); ?></option>
-            <?php endforeach; ?>
-        </select><br><br>
+        <!-- إدارة الطلاب -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">إدارة الطلاب</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>البريد</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($students as $student) { ?>
+                                <tr>
+                                    <form method="post">
+                                        <td>
+                                            <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($student['name']); ?>">
+                                        </td>
+                                        <td>
+                                            <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($student['email']); ?>">
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
+                                            <button type="submit" name="edit_student" class="btn btn-sm btn-success">تعديل</button>
+                                            <a href="?delete_id=<?php echo $student['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من الحذف؟');">حذف</a>
+                                        </td>
+                                    </form>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-        <label for="attendance_percentage">نسبة الحضور (%):</label>
-        <input type="number" name="attendance_percentage" min="0" max="100" step="0.01" required><br><br>
+        <!-- تسجيل الخروج -->
+        <div class="text-center">
+            <a href="logout.php" class="btn btn-outline-primary">تسجيل خروج</a>
+        </div>
+    </div>
 
-        <button type="submit" name="add_attendance">إضافة الحضور</button>
-    </form>
-    <hr>
-
-    <h2>إدارة الطلاب</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>الاسم</th>
-                <th>البريد</th>
-                <th>الإجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($students as $student) { ?>
-                <tr>
-                    <form method="post">
-                        <td>
-                            <input type="text" name="name" value="<?php echo htmlspecialchars($student['name']); ?>">
-                        </td>
-                        <td>
-                            <input type="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>">
-                        </td>
-                        <td>
-                            <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
-                            <button type="submit" name="edit_student">تعديل</button>
-                            <a href="?delete_id=<?php echo $student['id']; ?>" onclick="return confirm('هل أنت متأكد من الحذف؟');">حذف</a>
-                        </td>
-                    </form>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-
-    <a href="logout.php">تسجيل خروج</a>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
