@@ -9,25 +9,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'student') {
 
 $id = $_SESSION['user_id'];
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$id]);
-$student = $stmt->fetch(PDO::FETCH_ASSOC);
+// جلب بيانات الطالب
+$query_student = "SELECT * FROM users WHERE id = $1";
+$result_student = pg_query_params($conn, $query_student, array($id));
+$student = pg_fetch_assoc($result_student);
 
 // جلب الدرجات
-$stmt_grades = $conn->prepare("SELECT courses.course_name, grades.grade, courses.course_code 
-                               FROM grades 
-                               JOIN courses ON grades.course_id = courses.id
-                               WHERE grades.user_id = ?");
-$stmt_grades->execute([$id]);
-$grades = $stmt_grades->fetchAll(PDO::FETCH_ASSOC);
+$query_grades = "SELECT courses.course_name, grades.grade, courses.course_code 
+                 FROM grades 
+                 JOIN courses ON grades.course_id = courses.id
+                 WHERE grades.user_id = $1";
+$result_grades = pg_query_params($conn, $query_grades, array($id));
+$grades = pg_fetch_all($result_grades);
 
 // جلب الحضور
-$stmt_attendance = $conn->prepare("SELECT courses.course_name, attendance.attendance_percentage, courses.course_code 
-                                   FROM attendance 
-                                   JOIN courses ON attendance.course_id = courses.id
-                                   WHERE attendance.user_id = ?");
-$stmt_attendance->execute([$id]);
-$attendance = $stmt_attendance->fetchAll(PDO::FETCH_ASSOC);
+$query_attendance = "SELECT courses.course_name, attendance.attendance_percentage, courses.course_code 
+                     FROM attendance 
+                     JOIN courses ON attendance.course_id = courses.id
+                     WHERE attendance.user_id = $1";
+$result_attendance = pg_query_params($conn, $query_attendance, array($id));
+$attendance = pg_fetch_all($result_attendance);
 ?>
 
 <!DOCTYPE html>
