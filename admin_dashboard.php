@@ -8,14 +8,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 }
 
 // جلب الطلاب
-$stmt_students = $conn->prepare("SELECT * FROM users WHERE role = 'student'");
-$stmt_students->execute();
-$students = $stmt_students->fetchAll(PDO::FETCH_ASSOC);
+$query_students = "SELECT * FROM users WHERE role = 'student'";
+$result_students = pg_query($conn, $query_students);
+$students = pg_fetch_all($result_students);
 
 // جلب المقررات
-$stmt_courses = $conn->prepare("SELECT * FROM courses");
-$stmt_courses->execute();
-$courses = $stmt_courses->fetchAll(PDO::FETCH_ASSOC);
+$query_courses = "SELECT * FROM courses";
+$result_courses = pg_query($conn, $query_courses);
+$courses = pg_fetch_all($result_courses);
 
 // إضافة درجة
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_grade'])) {
@@ -23,9 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_grade'])) {
     $course_id = $_POST['course_id'];
     $grade = $_POST['grade'];
 
-    $stmt = $conn->prepare("INSERT INTO grades (user_id, course_id, grade) VALUES (?, ?, ?)");
-    $stmt->execute([$student_id, $course_id, $grade]);
-    echo "<script>alert('تم إضافة الدرجة بنجاح!');</script>";
+    $query = "INSERT INTO grades (user_id, course_id, grade) VALUES ($1, $2, $3)";
+    $result = pg_query_params($conn, $query, array($student_id, $course_id, $grade));
+    if ($result) {
+        echo "<script>alert('تم إضافة الدرجة بنجاح!');</script>";
+    }
 }
 
 // إضافة طالب جديد
@@ -35,15 +37,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_student'])) {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // تشفير كلمة المرور
 
     // التحقق من البريد الإلكتروني المكرر
-    $stmt_check = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
-    $stmt_check->execute([$email]);
-    $count = $stmt_check->fetchColumn();
+    $stmt_check = "SELECT COUNT(*) FROM users WHERE email = $1";
+    $result_check = pg_query_params($conn, $stmt_check, array($email));
+    $count = pg_fetch_result($result_check, 0, 0);
     if ($count > 0) {
         echo "<script>alert('البريد الإلكتروني مسجل بالفعل!');</script>";
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'student')");
-        $stmt->execute([$name, $email, $password]);
-        echo "<script>alert('تم إضافة الطالب بنجاح!');</script>";
+        $stmt = "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, 'student')";
+        $result = pg_query_params($conn, $stmt, array($name, $email, $password));
+        if ($result) {
+            echo "<script>alert('تم إضافة الطالب بنجاح!');</script>";
+        }
     }
 }
 
@@ -52,9 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_course'])) {
     $course_name = htmlspecialchars($_POST['course_name']);
     $course_code = htmlspecialchars($_POST['course_code']); // تم استخدام course_code بدلاً من course_description
 
-    $stmt = $conn->prepare("INSERT INTO courses (course_name, course_code) VALUES (?, ?)");
-    $stmt->execute([$course_name, $course_code]);
-    echo "<script>alert('تم إضافة الكورس بنجاح!');</script>";
+    $query = "INSERT INTO courses (course_name, course_code) VALUES ($1, $2)";
+    $result = pg_query_params($conn, $query, array($course_name, $course_code));
+    if ($result) {
+        echo "<script>alert('تم إضافة الكورس بنجاح!');</script>";
+    }
 }
 
 // تعديل بيانات الطالب
@@ -63,9 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_student'])) {
     $name = htmlspecialchars($_POST['name']);
     $email = htmlspecialchars($_POST['email']);
 
-    $stmt = $conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-    $stmt->execute([$name, $email, $student_id]);
-    echo "<script>alert('تم تعديل بيانات الطالب بنجاح!');</script>";
+    $query = "UPDATE users SET name = $1, email = $2 WHERE id = $3";
+    $result = pg_query_params($conn, $query, array($name, $email, $student_id));
+    if ($result) {
+        echo "<script>alert('تم تعديل بيانات الطالب بنجاح!');</script>";
+    }
 }
 
 // إضافة نسبة الحضور
@@ -75,18 +83,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_attendance'])) {
     $attendance_percentage = $_POST['attendance_percentage'];
 
     // التحقق هل هناك سجل حضور سابق لهذا الطالب والكورس
-    $stmt = $conn->prepare("SELECT id FROM attendance WHERE user_id = ? AND course_id = ?");
-    $stmt->execute([$student_id, $course_id]);
-    $attendance = $stmt->fetch(PDO::FETCH_ASSOC);
+    $query = "SELECT id FROM attendance WHERE user_id = $1 AND course_id = $2";
+    $result = pg_query_params($conn, $query, array($student_id, $course_id));
+    $attendance = pg_fetch_assoc($result);
 
     if ($attendance) {
         // إذا كان موجود، نحدثه
-        $stmt = $conn->prepare("UPDATE attendance SET attendance_percentage = ? WHERE id = ?");
-        $stmt->execute([$attendance_percentage, $attendance['id']]);
+        $query = "UPDATE attendance SET attendance_percentage = $1 WHERE id = $2";
+        pg_query_params($conn, $query, array($attendance_percentage, $attendance['id']));
     } else {
         // إذا لم يكن موجود، نضيف سجل جديد
-        $stmt = $conn->prepare("INSERT INTO attendance (user_id, course_id, attendance_percentage) VALUES (?, ?, ?)");
-        $stmt->execute([$student_id, $course_id, $attendance_percentage]);
+        $query = "INSERT INTO attendance (user_id, course_id, attendance_percentage) VALUES ($1, $2, $3)";
+        pg_query_params($conn, $query, array($student_id, $course_id, $attendance_percentage));
     }
 
     echo "<script>alert('تم إضافة/تحديث نسبة الحضور بنجاح!');</script>";
@@ -96,10 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_attendance'])) {
 if (isset($_GET['delete_id']) && is_numeric($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
 
-    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-    $stmt->execute([$delete_id]);
+    $query = "DELETE FROM users WHERE id = $1";
+    pg_query_params($conn, $query, array($delete_id));
     echo "<script>alert('تم حذف الطالب بنجاح!'); window.location.href='admin_dashboard.php';</script>";
 }
+
 ?>
 
 <!DOCTYPE html>
