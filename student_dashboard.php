@@ -32,63 +32,91 @@ $attendance = pg_fetch_all($result_attendance);
 ?>
 
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة الطالب</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>مرحباً، <?php echo htmlspecialchars($student['name']); ?></h1>
+    <div class="container my-4">
+        <h1 class="display-5 text-primary mb-4 text-center">مرحباً، <?php echo htmlspecialchars($student['name']); ?></h1>
 
-    <h2>الدرجات</h2>
-    <?php if (count($grades) > 0) { ?>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>اسم المادة</th>
-                    <th>رمز المادة</th>
-                    <th>الدرجة</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($grades as $grade) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($grade['course_name']); ?></td>
-                        <td><?php echo htmlspecialchars($grade['course_code']); ?></td>
-                        <td><?php echo htmlspecialchars($grade['grade']); ?></td>
-                    </tr>
+        <!-- الدرجات -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">الدرجات</div>
+            <div class="card-body">
+                <?php if (count($grades) > 0) { ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>اسم المادة</th>
+                                    <th>رمز المادة</th>
+                                    <th>الدرجة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($grades as $grade) { ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($grade['course_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($grade['course_code']); ?></td>
+                                        <td><?php echo htmlspecialchars($grade['grade']); ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php } else { ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        لا توجد درجات لهذا الطالب.
+                    </div>
                 <?php } ?>
-            </tbody>
-        </table>
-    <?php } else { ?>
-        <p>لا توجد درجات لهذا الطالب.</p>
-    <?php } ?>
+            </div>
+        </div>
 
-    <h2>نسبة الحضور</h2>
-    <?php if (count($attendance) > 0) { ?>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>اسم المادة</th>
-                    <th>رمز المادة</th>
-                    <th>نسبة الحضور</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($attendance as $attend) { ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($attend['course_name']); ?></td>
-                        <td><?php echo htmlspecialchars($attend['course_code']); ?></td>
-                        <td><?php echo htmlspecialchars($attend['attendance_percentage']); ?>%</td>
-                    </tr>
+        <!-- نسبة الحضور -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">نسبة الحضور</div>
+            <div class="card-body">
+                <?php if (count($attendance) > 0) { ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>اسم المادة</th>
+                                    <th>رمز المادة</th>
+                                    <th>نسبة الحضور</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($attendance as $attend) { ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($attend['course_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($attend['course_code']); ?></td>
+                                        <td><?php echo htmlspecialchars($attend['attendance_percentage']); ?>%</td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php } else { ?>
+                    <div class="alert alert-info text-center" role="alert">
+                        لا توجد بيانات حضور لهذا الطالب.
+                    </div>
                 <?php } ?>
-            </tbody>
-        </table>
-    <?php } else { ?>
-        <p>لا توجد بيانات حضور لهذا الطالب.</p>
-    <?php } ?>
+            </div>
+        </div>
 
-    <a href="logout.php">تسجيل خروج</a>
+        <!-- تسجيل الخروج -->
+        <div class="text-center">
+            <a href="logout.php" class="btn btn-outline-primary">تسجيل خروج</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
