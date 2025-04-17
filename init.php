@@ -1,11 +1,12 @@
 <?php
-// معلومات الاتصال
+// بيانات الاتصال بـ PostgreSQL
 $host = "dpg-d00d45qli9vc739pj8ag-a";
 $dbname = "rayat_db";
 $username = "rayat_db_user";
 $password = "9yi6q8Ui4GS8EoApQQmk40g1m65AYdEB";
 
 try {
+    // الاتصال بقاعدة البيانات باستخدام PDO
     $conn = new PDO("pgsql:host=$host;port=5432;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -41,23 +42,23 @@ try {
     ";
     $conn->exec($sql);
 
-    // إنشاء مستخدم أدمن
-    $adminName = "Admin";
+    // إنشاء مستخدم أدمن إذا لم يكن موجود
     $adminEmail = "admin@example.com";
-    $adminPassword = password_hash("admin123", PASSWORD_DEFAULT);
-    $role = "admin";
-
     $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
     $stmt->execute([$adminEmail]);
     $exists = $stmt->fetchColumn();
 
     if (!$exists) {
+        $adminName = "Admin";
+        $adminPassword = password_hash("admin123", PASSWORD_DEFAULT);
+        $role = "admin";
         $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
         $stmt->execute([$adminName, $adminEmail, $adminPassword, $role]);
-        echo "✅ تم إنشاء الجداول ومستخدم الأدمن بنجاح.";
+        echo "✅ تم إنشاء الجداول ومستخدم الأدمن.";
     } else {
         echo "ℹ️ مستخدم الأدمن موجود مسبقًا.";
     }
+
 } catch (PDOException $e) {
     echo "❌ خطأ في الاتصال أو التنفيذ: " . $e->getMessage();
 }
