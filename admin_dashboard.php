@@ -30,19 +30,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_grade'])) {
 
 // إضافة طالب جديد
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_student'])) {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // تشفير كلمة المرور
 
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'student')");
-    $stmt->execute([$name, $email, $password]);
-    echo "<script>alert('تم إضافة الطالب بنجاح!');</script>";
+    // التحقق من البريد الإلكتروني المكرر
+    $stmt_check = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+    $stmt_check->execute([$email]);
+    $count = $stmt_check->fetchColumn();
+    if ($count > 0) {
+        echo "<script>alert('البريد الإلكتروني مسجل بالفعل!');</script>";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'student')");
+        $stmt->execute([$name, $email, $password]);
+        echo "<script>alert('تم إضافة الطالب بنجاح!');</script>";
+    }
 }
 
 // إضافة كورس جديد
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_course'])) {
-    $course_name = $_POST['course_name'];
-    $course_code = $_POST['course_code']; // تم استخدام course_code بدلاً من course_description
+    $course_name = htmlspecialchars($_POST['course_name']);
+    $course_code = htmlspecialchars($_POST['course_code']); // تم استخدام course_code بدلاً من course_description
 
     $stmt = $conn->prepare("INSERT INTO courses (course_name, course_code) VALUES (?, ?)");
     $stmt->execute([$course_name, $course_code]);
@@ -52,13 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_course'])) {
 // تعديل بيانات الطالب
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_student'])) {
     $student_id = $_POST['student_id'];
-    $name = $_POST['name'];
-    $email = $_POST['email'];
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
 
     $stmt = $conn->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
     $stmt->execute([$name, $email, $student_id]);
     echo "<script>alert('تم تعديل بيانات الطالب بنجاح!');</script>";
 }
+
 // إضافة نسبة الحضور
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_attendance'])) {
     $student_id = $_POST['student_id'];
@@ -84,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_attendance'])) {
 }
 
 // حذف طالب
-if (isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
+if (isset($_GET['delete_id']) && is_numeric($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
 
     $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
     $stmt->execute([$delete_id]);
@@ -133,29 +142,29 @@ if (isset($_GET['delete_id'])) {
         <input type="text" name="course_code" placeholder="كود الكورس" required> <!-- تم تعديل حقل الوصف إلى كود الكورس -->
         <button type="submit" name="add_course">إضافة الكورس</button>
     </form>
+
     <h2>إضافة نسبة حضور</h2>
-<form method="POST">
-    <label for="student_id">اختر الطالب:</label>
-    <select name="student_id" required>
-        <?php foreach ($students as $student): ?>
-            <option value="<?= $student['id']; ?>"><?= htmlspecialchars($student['name']); ?></option>
-        <?php endforeach; ?>
-    </select><br><br>
+    <form method="POST">
+        <label for="student_id">اختر الطالب:</label>
+        <select name="student_id" required>
+            <?php foreach ($students as $student): ?>
+                <option value="<?= $student['id']; ?>"><?= htmlspecialchars($student['name']); ?></option>
+            <?php endforeach; ?>
+        </select><br><br>
 
-    <label for="course_id">اختر الكورس:</label>
-    <select name="course_id" required>
-        <?php foreach ($courses as $course): ?>
-            <option value="<?= $course['id']; ?>"><?= htmlspecialchars($course['course_name']); ?></option>
-        <?php endforeach; ?>
-    </select><br><br>
+        <label for="course_id">اختر الكورس:</label>
+        <select name="course_id" required>
+            <?php foreach ($courses as $course): ?>
+                <option value="<?= $course['id']; ?>"><?= htmlspecialchars($course['course_name']); ?></option>
+            <?php endforeach; ?>
+        </select><br><br>
 
-    <label for="attendance_percentage">نسبة الحضور (%):</label>
-    <input type="number" name="attendance_percentage" min="0" max="100" step="0.01" required><br><br>
+        <label for="attendance_percentage">نسبة الحضور (%):</label>
+        <input type="number" name="attendance_percentage" min="0" max="100" step="0.01" required><br><br>
 
-    <button type="submit" name="add_attendance">إضافة الحضور</button>
-</form>
-<hr>
-
+        <button type="submit" name="add_attendance">إضافة الحضور</button>
+    </form>
+    <hr>
 
     <h2>إدارة الطلاب</h2>
     <table border="1">
